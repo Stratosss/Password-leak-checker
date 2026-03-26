@@ -1,5 +1,4 @@
 🛡️ Password Leak Checker & Strength Auditor
-Developed by Stratos Gialouris
 
 A professional desktop utility built with Python and Flet that provides a comprehensive security audit of any password without compromising user privacy.
 
