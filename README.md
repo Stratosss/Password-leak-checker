@@ -31,16 +31,12 @@ Networking: requests
 
 🚀 Installation & Usage
 Clone the repo:
-
-Bash
 git clone [your-repo-link]
 
 Install dependencies:
-Bash
 pip install -r requirements.txt
 
 Run the application:
-Bash
 python Password_leak_checker.py
 
 ![App Screenshot](Snapshots/1.jpg)
