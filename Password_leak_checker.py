@@ -1,6 +1,5 @@
 import requests
 import hashlib
-import sys
 import flet as ft
 from zxcvbn import zxcvbn
 from datetime import datetime
