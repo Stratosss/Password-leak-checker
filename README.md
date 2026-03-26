@@ -12,7 +12,7 @@ Heuristic Strength Analysis: Integrated with the zxcvbn library (developed by Dr
 
 Actionable Feedback: Provides specific "Warnings" and "Recommendations" to help users improve their password complexity.
 
-Modern UI/UX: * Dark Mode interface for a sleek, professional look.
+Modern UI/UX: * Dark/ Light Mode selection for a sleek, professional look.
 
 Interactive Progress Bar that visually reflects password strength.
 
