@@ -34,12 +34,12 @@ Clone the repo:
 
 Bash
 git clone [your-repo-link]
-Install dependencies:
 
+Install dependencies:
 Bash
 pip install -r requirements.txt
-Run the application:
 
+Run the application:
 Bash
 python Password_leak_checker.py
 
