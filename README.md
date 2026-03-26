@@ -18,7 +18,7 @@ Interactive Progress Bar that visually reflects password strength.
 
 Visibility Toggle: An "Eye" icon to show/hide plain text during entry.
 
-Fixed Layout: A stable 1000x600 window to maintain UI integrity across different devices.
+Fixed Layout: A resizable 1000x620 window to maintain UI integrity across different devices.
 
 🛠️ Technical Stack
 GUI Framework: Flet (Flutter for Python)
