@@ -43,8 +43,8 @@ Run the application:
 Bash
 python Password_leak_checker.py
 
-<img src="1.jpg" width="400" />
-<img src="2.jpg" width="400" />
-<img src="3.jpg" width="400" />
-<img src="4.jpg" width="400" />
-<img src="5.jpg" width="400" />
+![App Screenshot](Snapshots/1.jpg)
+![App Screenshot](Snapshots/2.jpg)
+![App Screenshot](Snapshots/3.jpg)
+![App Screenshot](Snapshots/4.jpg)
+![App Screenshot](Snapshots/5.jpg)
