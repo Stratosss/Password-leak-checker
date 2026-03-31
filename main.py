@@ -36,10 +36,12 @@ def main(page: ft.Page):
       res = requests.get(url, timeout=5) # Added a timeout so it doesn't hang forever
       res.raise_for_status() # This triggers an error if the site is down (e.g., 500 error)
       return res
+    except requests.exceptions.HTTPError: # This catches HTTP errors, such as 404 (not found) or 500 (server error)
+        return "API ERROR (Server Issue)"  
     except requests.exceptions.ConnectionError: # This catches connection errors, such as when the user is offline or the server is unreachable
-        return "CONNECTION_ERROR"
+        return "CONNECTION ERROR (Check your internet connection)"
     except requests.exceptions.Timeout: # This catches timeout errors, which occur when the server takes too long to respond
-        return "TIMEOUT_ERROR"
+        return "TIMEOUT ERROR (Server is taking too long to respond)"
       
   def get_password_leaks_count(hashes, hash_to_check):  #Enters function with hashes= response from website, and hash_to_check= tail from password
     hashes = (line.split(':') for line in hashes.text.splitlines()) #Creates tuples with line.split(:) command to make the resposes of the website each one of them a tupple (Encoded Password : counts it was found)
@@ -68,8 +70,8 @@ def main(page: ft.Page):
                                                     
   def input_func(password):
       count = pwned_api_check(password)
-      if count =="CONNECTION_ERROR" or count == "TIMEOUT_ERROR":
-        message_text.value = "⚠️ Connection failed. Check your internet connection and try again!"
+      if count in ["API ERROR (Server Issue)", "CONNECTION ERROR (Check your internet connection)", "TIMEOUT ERROR (Server is taking too long to respond)"]:
+        message_text.value = f"⚠️ {count}.\n      Please try again later."
         message_text.color = ft.Colors.RED
         message_text.visible = True
         info_tile.visible = False
@@ -84,7 +86,7 @@ def main(page: ft.Page):
         feedback_suggestions = '\nRecommendations:\n- ' + '\n- '.join(strength['feedback']['suggestions']) if strength['feedback']['suggestions'] else ''
         feedback_text.value = f'{feedback_warning}\n{feedback_suggestions}'
           
-        if count: 
+        if count:
           message_text.value = f'⚠️ Given password was found {count} times... It is recommended to change your password!'
           message_text.visible = True                
         else:
