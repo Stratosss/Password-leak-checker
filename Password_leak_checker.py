@@ -31,12 +31,16 @@ def main(page: ft.Page):
   page.title = "Password Leak Checker App"
     
   def request_api_data(query_char):              #enters the 5 first chars from password as requested in pwned_api_check()
-    url = 'https://api.pwnedpasswords.com/range/' + query_char 
-    res = requests.get(url)           #requests a response from the website (URL): returns the tails/suffix of passwords of the prefix (5 first chars) we gave it
-    if res.status_code != 200:        
-      raise RuntimeError(f'Error fetching: {res.status_code}, check the api and try again')
-    return res 
-
+    try: 
+      url = 'https://api.pwnedpasswords.com/range/' + query_char 
+      res = requests.get(url, timeout=5) # Added a timeout so it doesn't hang forever
+      res.raise_for_status() # This triggers an error if the site is down (e.g., 500 error)
+      return res
+    except requests.exceptions.ConnectionError: # This catches connection errors, such as when the user is offline or the server is unreachable
+        return "CONNECTION_ERROR"
+    except requests.exceptions.Timeout: # This catches timeout errors, which occur when the server takes too long to respond
+        return "TIMEOUT_ERROR"
+      
   def get_password_leaks_count(hashes, hash_to_check):  #Enters function with hashes= response from website, and hash_to_check= tail from password
     hashes = (line.split(':') for line in hashes.text.splitlines()) #Creates tuples with line.split(:) command to make the resposes of the website each one of them a tupple (Encoded Password : counts it was found)
     for h, count in hashes:   
@@ -48,42 +52,52 @@ def main(page: ft.Page):
     sha1password = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()  #converts the actual password into SHA1, utf-8 encoding password, then the HASH object into a readable hexadecimal string, and finally the whole string: uppercase
     first5_char, tail = sha1password[:5], sha1password[5:]  #splits the encoded password into 2 groups: up to 5 first digits, from 6th digit till the end of the password
     response = request_api_data(first5_char)        #give only the 5 first chars from the masked-hash password as a safety measure so that it's not recognised
+    if isinstance(response, str):
+        return response
     return get_password_leaks_count(response, tail)  
   
   def validation_for_password(e): # This function is used to validate the password input before calling the API check, it ensures that the user has entered a password and provides feedback if they haven't.
     password = given_password.value
-    if not password:
-      message_text.value = 'Please enter a password to check.'
+    if not password or password.isspace():  # Check if the password is empty or only contains whitespace
+      given_password.value=''  # Clear the input field
+      message_text.value = 'Please enter a password to check (cannot be empty or only spaces).'
       message_text.visible = True
       page.update()
       return False
     return input_func(password)
                                                     
   def input_func(password):
-    info_tile.visible = True
-    
-    count = pwned_api_check(password)
-    
-    strength = zxcvbn(password)
-    score = strength['score']
-    score_text.value = f'Password strength score (0-4): {score}'
-    feedback_warning = '\nWarnings:\n- ' + strength['feedback']['warning'] if strength['feedback']['warning'] else '\nNo warnings!! 🥳'
-    feedback_suggestions = '\nRecommendations:\n- ' + '\n- '.join(strength['feedback']['suggestions']) if strength['feedback']['suggestions'] else ''
-    feedback_text.value = f'{feedback_warning}\n{feedback_suggestions}'
-      
-    if count: 
-      message_text.value = f'⚠️ Given password was found {count} times... It is recommended to change your password!'
-      message_text.visible = True                
-    else:
-      message_text.value = f'Given password was NOT found!'
-      message_text.visible = True
-      message_text.color = ft.Colors.GREEN
-    
-    score_text.color= colour_coding.get(score, ft.Colors.WHITE) # Default to WHITE if score is out of range 
-    strength_bar.value = score  / 4  # Normalize score to range [0, 1]
-    strength_bar.color = colour_coding.get(score, ft.Colors.GREY)
-    strength_bar.animate_width = 300  
-    page.update()
+      count = pwned_api_check(password)
+      if count =="CONNECTION_ERROR" or count == "TIMEOUT_ERROR":
+        message_text.value = "⚠️ Connection failed. Check your internet connection and try again!"
+        message_text.color = ft.Colors.RED
+        message_text.visible = True
+        info_tile.visible = False
+        page.update()
+        return
+      else:
+        info_tile.visible = True
+        strength = zxcvbn(password)
+        score = strength['score']
+        score_text.value = f'Password strength score (0-4): {score}'
+        feedback_warning = '\nWarnings:\n- ' + strength['feedback']['warning'] if strength['feedback']['warning'] else '\nNo warnings!! 🥳'
+        feedback_suggestions = '\nRecommendations:\n- ' + '\n- '.join(strength['feedback']['suggestions']) if strength['feedback']['suggestions'] else ''
+        feedback_text.value = f'{feedback_warning}\n{feedback_suggestions}'
+          
+        if count: 
+          message_text.value = f'⚠️ Given password was found {count} times... It is recommended to change your password!'
+          message_text.visible = True                
+        else:
+          message_text.value = f'Given password was NOT found!'
+          message_text.visible = True
+          message_text.color = ft.Colors.GREEN
+        
+        score_text.color= colour_coding.get(score, ft.Colors.WHITE) # Default to WHITE if score is out of range 
+        strength_bar.value = score  / 4  # Normalize score to range [0, 1]
+        strength_bar.color = colour_coding.get(score, ft.Colors.GREY)
+        strength_bar.animate_width = 300  
+        page.update()
+        return
   
   def on_password_change(e):
     # Hide the old results as soon as they start typing something new
