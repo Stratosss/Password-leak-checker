@@ -47,7 +47,7 @@ def main(page: ft.Page):
     hashes = (line.split(':') for line in hashes.text.splitlines()) #Creates tuples with line.split(:) command to make the resposes of the website each one of them a tupple (Encoded Password : counts it was found)
     for h, count in hashes:   
       if h == hash_to_check:   #It checks in the hashes list if any of them match the rest of my password(), if it finds, it returns the counts of it.
-        return count
+        return int(count) #We make the count an integer to be able to use it later in the app (input_func function), if it doesn't find it, it returns 0, which means that the password was not found in the database of leaked passwords.
     return 0   
 
   def pwned_api_check(password):
@@ -70,7 +70,7 @@ def main(page: ft.Page):
                                                     
   def input_func(password):
       count = pwned_api_check(password)
-      if count in ["API ERROR (Server Issue)", "CONNECTION ERROR (Check your internet connection)", "TIMEOUT ERROR (Server is taking too long to respond)"]:
+      if isinstance(count, str):  # This means an error message was returned instead of a count (we made count an integer earlier in get_password_leaks_count, so if it's a string, it's an error message)
         message_text.value = f"⚠️ {count}.\n      Please try again later."
         message_text.color = ft.Colors.RED
         message_text.visible = True
