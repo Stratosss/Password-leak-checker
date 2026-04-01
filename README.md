@@ -19,6 +19,8 @@ Visibility Toggle: An "Eye" icon to show/hide plain text during entry.
 
 Resizable Layout: A resizable 1000x620 window to maintain UI integrity across different devices.
 
+Error Handling: Measures are in place to protect the app from crashing due to an error, and an error message is displayed for the user.
+
 🛠️ Technical Stack
 GUI Framework: Flet (Flutter for Python)
 
